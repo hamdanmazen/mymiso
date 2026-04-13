@@ -14,6 +14,7 @@ import {
   ShoppingBag,
   Settings,
   Shield,
+  Store,
 } from "lucide-react";
 import { SearchBar } from "./SearchBar";
 import { ThemeToggle } from "./ThemeToggle";
@@ -34,6 +35,7 @@ export function Navbar({ notificationSlot }: NavbarProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [user, setUser] = useState<SupabaseUser | null>(null);
   const [userRole, setUserRole] = useState<string | null>(null);
+  const [isSeller, setIsSeller] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
   const itemCount = useCartStore((s) => s.getItemCount());
@@ -54,6 +56,12 @@ export function Navbar({ notificationSlot }: NavbarProps) {
           .eq("id", data.user.id)
           .single()
           .then(({ data: profile }) => setUserRole(profile?.role ?? null));
+        supabase
+          .from("sellers")
+          .select("id")
+          .eq("user_id", data.user.id)
+          .maybeSingle()
+          .then(({ data: seller }) => setIsSeller(!!seller));
       }
     });
 
@@ -62,7 +70,10 @@ export function Navbar({ notificationSlot }: NavbarProps) {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {
       setUser(session?.user ?? null);
-      if (!session?.user) setUserRole(null);
+      if (!session?.user) {
+        setUserRole(null);
+        setIsSeller(false);
+      }
     });
 
     return () => subscription.unsubscribe();
@@ -222,6 +233,25 @@ export function Navbar({ notificationSlot }: NavbarProps) {
                       <Settings size={16} />
                       Settings
                     </Link>
+                    {isSeller ? (
+                      <Link
+                        href="/seller/dashboard"
+                        onClick={() => setMenuOpen(false)}
+                        className="flex items-center gap-3 px-4 py-2 text-[14px] text-mizo-teal hover:bg-mizo-teal-subtle transition-colors"
+                      >
+                        <Store size={16} />
+                        Seller Dashboard
+                      </Link>
+                    ) : (
+                      <Link
+                        href="/seller/onboarding"
+                        onClick={() => setMenuOpen(false)}
+                        className="flex items-center gap-3 px-4 py-2 text-[14px] text-mizo-teal hover:bg-mizo-teal-subtle transition-colors"
+                      >
+                        <Store size={16} />
+                        Start Selling
+                      </Link>
+                    )}
                     {userRole === "admin" && (
                       <Link
                         href="/admin/dashboard"
