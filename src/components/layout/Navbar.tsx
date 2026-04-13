@@ -10,7 +10,9 @@ import { LanguageSelector } from "./LanguageSelector";
 import { CurrencySelector } from "./CurrencySelector";
 import { useCartStore } from "@/stores/cartStore";
 import { useTranslations } from "next-intl";
+import { createClient } from "@/lib/supabase/client";
 import type { ReactNode } from "react";
+import type { User as SupabaseUser } from "@supabase/supabase-js";
 
 interface NavbarProps {
   notificationSlot?: ReactNode;
@@ -19,9 +21,15 @@ interface NavbarProps {
 export function Navbar({ notificationSlot }: NavbarProps) {
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [user, setUser] = useState<SupabaseUser | null>(null);
   const itemCount = useCartStore((s) => s.getItemCount());
   const openCart = useCartStore((s) => s.openCart);
   const t = useTranslations("nav");
+
+  useEffect(() => {
+    const supabase = createClient();
+    supabase.auth.getUser().then(({ data }) => setUser(data.user));
+  }, []);
 
   useEffect(() => {
     function onScroll() {
@@ -106,7 +114,7 @@ export function Navbar({ notificationSlot }: NavbarProps) {
 
           {/* User / Login */}
           <Link
-            href="/login"
+            href={user ? "/dashboard" : "/login"}
             className="p-2 text-text-secondary hover:text-text-primary transition-colors"
             aria-label={t("account")}
           >
