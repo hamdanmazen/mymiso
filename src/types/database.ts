@@ -15,7 +15,7 @@ export interface Database {
           full_name: string | null;
           avatar_url: string | null;
           phone: string | null;
-          role: "buyer" | "seller" | "both";
+          role: "buyer" | "seller" | "both" | "admin";
           preferred_language: string;
           preferred_currency: string;
           created_at: string;
@@ -26,7 +26,7 @@ export interface Database {
           full_name?: string | null;
           avatar_url?: string | null;
           phone?: string | null;
-          role?: "buyer" | "seller" | "both";
+          role?: "buyer" | "seller" | "both" | "admin";
           preferred_language?: string;
           preferred_currency?: string;
           created_at?: string;
@@ -37,7 +37,7 @@ export interface Database {
           full_name?: string | null;
           avatar_url?: string | null;
           phone?: string | null;
-          role?: "buyer" | "seller" | "both";
+          role?: "buyer" | "seller" | "both" | "admin";
           preferred_language?: string;
           preferred_currency?: string;
           updated_at?: string;

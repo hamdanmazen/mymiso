@@ -152,20 +152,4 @@ create policy "Seller updates received orders" on public.orders
     seller_id in (select id from public.sellers where user_id = auth.uid())
   );
 
--- RLS: notifications - users read/update own
-alter table public.notifications enable row level security;
-create policy "Own notifications" on public.notifications
-  for select using (user_id = auth.uid());
-create policy "Update own notifications" on public.notifications
-  for update using (user_id = auth.uid());
-
--- RLS: addresses - users manage own
-alter table public.addresses enable row level security;
-create policy "Own addresses select" on public.addresses
-  for select using (user_id = auth.uid());
-create policy "Own addresses insert" on public.addresses
-  for insert with check (user_id = auth.uid());
-create policy "Own addresses update" on public.addresses
-  for update using (user_id = auth.uid());
-create policy "Own addresses delete" on public.addresses
-  for delete using (user_id = auth.uid());
+-- NOTE: RLS for notifications and addresses already enabled in 00001_create_tables.sql
