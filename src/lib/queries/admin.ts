@@ -1,4 +1,5 @@
 import { createClient, isSupabaseConfigured } from "@/lib/supabase/server";
+import { redirect } from "next/navigation";
 import type { Database } from "@/types/database";
 
 type ProfileRow = Database["public"]["Tables"]["profiles"]["Row"];
@@ -11,13 +12,13 @@ type CategoryRow = Database["public"]["Tables"]["categories"]["Row"];
 // --- Auth helper ---
 
 export async function requireAdmin(): Promise<string> {
-  if (!isSupabaseConfigured()) throw new Error("Supabase not configured");
+  if (!isSupabaseConfigured()) redirect("/login");
 
   const supabase = (await createClient())!;
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) throw new Error("Not authenticated");
+  if (!user) redirect("/login?redirect=/admin/dashboard");
 
   const { data: profile } = await supabase
     .from("profiles")
@@ -25,7 +26,7 @@ export async function requireAdmin(): Promise<string> {
     .eq("id", user.id)
     .single();
 
-  if (profile?.role !== "admin") throw new Error("Not authorized");
+  if (profile?.role !== "admin") redirect("/");
   return user.id;
 }
 
